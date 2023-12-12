@@ -19,10 +19,8 @@ function parseInput(input) {
 function navigateNetwork(route, nodes) {
 	let numSteps = 0;
 	let curNode = nodes['AAA'];
-	// console.log(`Starting at ${curNode} with route ${route}`);
 	while (curNode[0] !== 'ZZZ') {
 		for (let dir of route) {
-			// console.log(`Going ${[,'L','R'][dir]} from ${curNode[0]} to ${curNode[dir]}`);
 			curNode = nodes[curNode[dir]];
 			numSteps++;
 		}
@@ -30,28 +28,43 @@ function navigateNetwork(route, nodes) {
 	return numSteps;
 }
 
-function navigateNetworkAsGhost (route, nodes) {
+function navigateNetworkAsGhostInefficient(route, nodes) {
 	let numSteps = 0;
-	let iteration = 0;
 	let curNodes = Object.keys(nodes)
 		.filter(key => key.endsWith('A'))
 		.map(key => nodes[key]);
-	// for (curNode of curNodes)
-		// console.log(`Starting at ${curNode}`);
 	while (curNodes.some(node => !node[0].endsWith('Z'))) {
-		// console.log(`iteration ${++iteration}`);
 		for (let dir of route) {
-			// console.log(`Step ${numSteps+1}`);
-			// for (let n of curNodes) {
-			// 	console.log(`  Going ${[,'L','R'][dir]} from ${n[0]} to ${n[dir]}`);
-			// }
 			curNodes = curNodes.map(curNode => nodes[curNode[dir]]);
 			numSteps++;
 		}
-		// console.log(`Current node: ${curNodes.map(curNode => curNode[0])}`);
-		// console.log(`Number of steps: ${numSteps}`);
 	}
 	return numSteps;
+}
+
+function lcm(input, gcd) {
+	let lcm = input[0];
+	for (let i = 1; i < input.length; i++) {
+		lcm = input[i] * (lcm / gcd);
+	}
+	return lcm;
+}
+
+function navigateNetworkAsGhost(route, nodes) {
+	const curNodes = Object.keys(nodes)
+		.filter(key => key.endsWith('A'))
+		.map(key => nodes[key]);
+	const numSteps = new Array(curNodes.length).fill(0);
+
+	curNodes.forEach((curNode, index) => {
+		while (!curNode[0].endsWith('Z')) {
+			for (let dir of route) {
+				curNode = nodes[curNode[dir]];
+				numSteps[index]++;
+			}
+		}
+	});
+	return lcm(numSteps, route.length);
 }
 
 function returnDay8Part1Result(input) {
